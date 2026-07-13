@@ -7,9 +7,9 @@
 <meta property="og:title" content="Miraya's 1st Birthday — RSVP 🎀">
 <meta property="og:description" content="5th Sept (Sat.) · 13:00 · Tokyo Mithaiwala, Nishikasai — tap to tell us if you can join!">
 <meta name="description" content="RSVP for Miraya's 1st Birthday — 5th Sept (Sat.), 13:00, Tokyo Mithaiwala, Nishikasai.">
-<link rel="preconnect" href="https://googleapis.com">
-<link rel="preconnect" href="https://gstatic.com" crossorigin>
-<link href="https://googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://googleapis.com" rel="stylesheet">
 <style>
 :root{
   --pink:#E7C3C9; --pink-soft:#F3DDE1; --rose:#C67C8A; --mauve:#B05A6A;
@@ -205,7 +205,6 @@ summary::-webkit-details-marker{display:none}
     <button class="submit" id="submitBtn" onclick="submitRSVP()">Send my RSVP ♥</button>
     <div class="err" id="err"></div>
   </div>
-
   <!-- ============ THANK-YOU VIEW ============ -->
   <div id="done">
     <h2 id="doneTitle">Thank you! 🎉</h2>
@@ -221,4 +220,199 @@ summary::-webkit-details-marker{display:none}
     <div id="pinGate" style="text-align:center;margin-top:14px">
       <div style="font-weight:800;font-size:13px;color:#9b8a8e;margin-bottom:8px">Enter host PIN to view responses</div>
       <input type="text" id="pin" inputmode="numeric" maxlength="4" placeholder="• • • •"
-style="width:130px;text-align:center;letter-spacing:.35em;font-size:18px">UnlockLoading…/* ---------- ambient sparkles ---------- */(function(){for(let i=0;i<14;i++){const s=document.createElement('div');s.className='sparkle';s.textContent='✦';s.style.left=Math.random()*100+'vw';s.style.top=Math.random()*100+'vh';s.style.fontSize=(10+Math.random()*16)+'px';s.style.animationDelay=(Math.random()*3)+'s';document.body.appendChild(s);}})();/* ---------- form state ---------- */let attending=null, total=1, kids=0, unlocked=false;const HOST_PIN='0509';const $=id=>document.getElementById(id);$('btnYes').onclick=()=>setAttend(true);$('btnNo').onclick=()=>setAttend(false);function setAttend(v){attending=v;$('btnYes').classList.toggle('sel',v);$('btnNo').classList.toggle('sel',!v);$('extra').classList.toggle('open',v);}function step(which,d){if(which==='total'){ total=Math.min(12,Math.max(1,total+d)); if(kids>total) kids=Math.min(kids,total); }else { kids=Math.min(8,Math.max(0,kids+d)); if(kids>total) total=kids; }$('totalN').textContent=total; $('kidsN').textContent=kids;renderAges();}function renderAges(){const box=$('ages'); const prev=[...box.querySelectorAll('select')].map(s=>s.value);box.innerHTML='';for(let i=0;i<kids;i++){const div=document.createElement('div');div.className='kid';const sel=document.createElement('select');sel.innerHTML='age?'+'under 1'+Array.from({length:17},(_,a)=><option value="${a+1}">${a+1}</option>).join('');if(prev[i]) sel.value=prev[i];div.append(Kid ${i+1}: ,sel);box.appendChild(div);}}function buildEntry(){const name=$('name').value.trim();if(!name) return {error:'Please tell us your name 🙂'};if(attending===null) return {error:'Please choose yes or no 🙂'};const entry={key: 'rsvp' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), name, attending, ts:Date.now()};if(attending){entry.total=total; entry.kids=kids;entry.ages=[...$('ages').querySelectorAll('select')].map(s=>s.value);if(entry.ages.some(a=>a==='')) return {error:'Please pick an age for each kid 🙂'};entry.ages=entry.ages.map(a=>a==='0'?'under 1':a);}entry.msg=$('msg').value.trim();return {entry};}function summaryText(e){let s=RSVP — Miraya's 1st Birthday\nName: ${e.name}\nAttending: ${e.attending?'YES 🎉':'No 😢'};if(e.attending){s+=\nGuests: ${e.total} (kids: ${e.kids}${e.kids? — ages ${e.ages.join(', ')}:''});}if(e.msg) s+=\nMessage: ${e.msg};return s;}let lastSummary='';function submitRSVP(){$('err').textContent='';const {entry,error}=buildEntry();if(error){$('err').textContent=error;return;}let localData = JSON.parse(localStorage.getItem('rsvp_records_v4')) || [];localData.push(entry);localStorage.setItem('rsvp_records_v4', JSON.stringify(localData));lastSummary=summaryText(entry);$('form').style.display='none';$('done').style.display='block';$('doneTitle').textContent=entry.attending?'Yay, see you there! 🎉':"We'll miss you 💗";$('doneText').textContent=Thank you ${entry.name}! For link stability on your free web host, please copy the summary below and message it directly to Miraya's family. 💌;$('summaryBox').style.display='block';$('summaryBox').textContent=lastSummary;$('copyBtn').style.display='inline-block';confettiPop();if(unlocked) loadResponses();}function copySummary(){if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(lastSummary);} else {const el = document.createElement('textarea');el.value = lastSummary;document.body.appendChild(el);el.select();document.execCommand('copy');el.remove();}$('copyBtn').textContent='Copied! ✓';setTimeout(()=>$('copyBtn').textContent='Copy my response',1600);}function resetForm(){$('done').style.display='none';$('form').style.display='block';$('summaryBox').style.display='none';$('copyBtn').style.display='none';$('name').value='';$('msg').value='';attending=null;$('btnYes').classList.remove('sel');$('btnNo').classList.remove('sel');$('extra').classList.remove('open');total=1;kids=0;$('totalN').textContent=1;$('kidsN').textContent=0;renderAges();}function confettiPop(){const colors=['#C67C8A','#E7C3C9','#DBB26A','#fff','#B05A6A'];for(let i=0;i<36;i++){const p=document.createElement('div');p.style.cssText=position:fixed;left:50%;top:38%;width:9px;height:12px;z-index:9;pointer-events:none; background:${colors[i%colors.length]};border-radius:${i%3?2:8}px;;document.body.appendChild(p);const a=Math.random()Math.PI2, v=120+Math.random()*220;const dx=Math.cos(a)*v, dy=Math.sin(a)*v-160;p.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:translate(${dx}px,${dy+320}px) rotate(${Math.random()*720-360}deg),opacity:0}],{duration:1400+Math.random()*700,easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>p.remove();}}/* ---------- host area dashboard ---------- */function loadResponses(){if(!unlocked) return;const status=$('hostStatus'), list=$('list'), totalsEl=$('totals');let entries = JSON.parse(localStorage.getItem('rsvp_records_v4')) || [];list.innerHTML=''; totalsEl.innerHTML='';if(!entries.length){ status.textContent='No responses captured on this device yet.'; return; }status.textContent='';entries.sort((a,b)=>b.ts-a.ts);let g=0,kd=0,yes=0,no=0;entries.forEach(e=>{ if(e.attending){yes++;g+=e.total||0;kd+=e.kids||0;} else no++; });totalsEl.innerHTML= <div class="tot"><div class="n">${g}</div><div class="l">Guests</div></div> <div class="tot"><div class="n">${g-kd}</div><div class="l">Adults</div></div> <div class="tot"><div class="n">${kd}</div><div class="l">Kids</div></div> <div class="tot"><div class="n">${yes}/${yes+no}</div><div class="l">Yes</div></div>;const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&','<':'<','>':'>','"':'"'}[c]));entries.forEach(e=>{const d=document.createElement('div');d.className='resp';d.innerHTML=<span class="who">${esc(e.name)}</span> <span class="tag ${e.attending?'yes':'no'}">${e.attending?'Coming':'Not coming'}</span> ${e.attending?${e.total} guest${e.total>1?'s':''} · ${e.kids} kid${e.kids===1?'':'s'}${e.kids? (ages ${esc(e.ages.join(', '))}):''}:''} ${e.msg?"${esc(e.msg)}":''} <button class="del" title="Remove" onclick="delResp('${e._key}')">✕</button>;list.appendChild(d);});}function delResp(key){if(!confirm('Remove this response?'))return;let entries = JSON.parse(localStorage.getItem('rsvp_records_v4')) || [];entries = entries.filter(e => e._key !== key);localStorage.setItem('rsvp_records_v4', JSON.stringify(entries));loadResponses();}function checkPin(){if($('pin').value===HOST_PIN){unlocked=true;$('pinGate').style.display='none';$('hostPanel').style.display='block';loadResponses();}else{$('pinErr').textContent='Wrong PIN';$('pin').value='';}}$('pin') && $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')checkPin();});$('host').addEventListener('toggle',()=>{ if($('host').open && unlocked) loadResponses(); });renderAges();
+        style="width:130px;text-align:center;letter-spacing:.35em;font-size:18px">
+      <button class="mini" style="margin-top:0" onclick="checkPin()">Unlock</button>
+      <div class="err" id="pinErr"></div>
+    </div>
+    <div id="hostPanel" style="display:none">
+      <div id="hostStatus">Loading…</div>
+      <div class="totals" id="totals"></div>
+      <div id="list"></div>
+    </div>
+  </details>
+</div>
+
+<script>
+/* ---------- ambient sparkles ---------- */
+(function(){
+  for(let i=0;i<14;i++){
+    const s=document.createElement('div');
+    s.className='sparkle';s.textContent='✦';
+    s.style.left=Math.random()*100+'vw';
+    s.style.top=Math.random()*100+'vh';
+    s.style.fontSize=(10+Math.random()*16)+'px';
+    s.style.animationDelay=(Math.random()*3)+'s';
+    document.body.appendChild(s);
+  }
+})();
+
+/* ---------- form state ---------- */
+let attending=null, total=1, kids=0, unlocked=false;
+const HOST_PIN='0509'; 
+
+const $=id=>document.getElementById(id);
+$('btnYes').onclick=()=>setAttend(true);
+$('btnNo').onclick=()=>setAttend(false);
+
+function setAttend(v){
+  attending=v;
+  $('btnYes').classList.toggle('sel',v);
+  $('btnNo').classList.toggle('sel',!v);
+  $('extra').classList.toggle('open',v);
+}
+function step(which,d){
+  if(which==='total'){ total=Math.min(12,Math.max(1,total+d)); if(kids>total) kids=Math.min(kids,total); }
+  else { kids=Math.min(8,Math.max(0,kids+d)); if(kids>total) total=kids; }
+  $('totalN').textContent=total; $('kidsN').textContent=kids;
+  renderAges();
+}
+function renderAges(){
+  const box=$('ages'); const prev=[...box.querySelectorAll('select')].map(s=>s.value);
+  box.innerHTML='';
+  for(let i=0;i<kids;i++){
+    const div=document.createElement('div');div.className='kid';
+    const sel=document.createElement('select');
+    sel.innerHTML='<option value="">age?</option>'+
+      '<option value="0">under 1</option>'+
+      Array.from({length:17},(_,a)=>`<option value="${a+1}">${a+1}</option>`).join('');
+    if(prev[i]) sel.value=prev[i];
+    div.append(`Kid ${i+1}: `,sel);
+    box.appendChild(div);
+  }
+}
+
+function buildEntry(){
+  const name=$('name').value.trim();
+  if(!name) return {error:'Please tell us your name 🙂'};
+  if(attending===null) return {error:'Please choose yes or no 🙂'};
+  const entry={_key: 'rsvp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), name, attending, ts:Date.now()};
+  if(attending){
+    entry.total=total; entry.kids=kids;
+    entry.ages=[...$('ages').querySelectorAll('select')].map(s=>s.value);
+    if(entry.ages.some(a=>a==='')) return {error:'Please pick an age for each kid 🙂'};
+    entry.ages=entry.ages.map(a=>a==='0'?'under 1':a);
+  }
+  entry.msg=$('msg').value.trim();
+  return {entry};
+}
+
+function summaryText(e){
+  let s=`RSVP — Miraya's 1st Birthday\nName: ${e.name}\nAttending: ${e.attending?'YES 🎉':'No 😢'}`;
+  if(e.attending){
+    s+=`\nGuests: ${e.total} (kids: ${e.kids}${e.kids?` — ages ${e.ages.join(', ')}`:''})`;
+  }
+  if(e.msg) s+=`\nMessage: ${e.msg}`;
+  return s;
+}
+
+let lastSummary='';
+function submitRSVP(){
+  $('err').textContent='';
+  const {entry,error}=buildEntry();
+  if(error){$('err').textContent=error;return;}
+  
+  let localData = JSON.parse(localStorage.getItem('rsvp_records_final')) || [];
+  localData.push(entry);
+  localStorage.setItem('rsvp_records_final', JSON.stringify(localData));
+
+  lastSummary=summaryText(entry);
+  $('form').style.display='none';
+  $('done').style.display='block';
+  $('doneTitle').textContent=entry.attending?'Yay, see you there! 🎉':"We'll miss you 💗";
+  
+  $('doneText').textContent suicide=`Thank you ${entry.name}! To safely track your response on your custom invite link, please copy your summary block below and message it directly to Miraya's family. 💌`;
+  $('summaryBox').style.display='block';$('summaryBox').textContent=lastSummary;
+  $('copyBtn').style.display='inline-block';
+  
+  confettiPop();
+  if(unlocked) loadResponses();
+}
+
+function copySummary(){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(lastSummary);
+  } else {
+    const el = document.createElement('textarea');el.value = lastSummary;
+    document.body.appendChild(el);el.select();document.execCommand('copy');el.remove();
+  }
+  $('copyBtn').textContent='Copied! ✓';
+  setTimeout(()=>$('copyBtn').textContent='Copy my response',1600);
+}
+
+function resetForm(){
+  $('done').style.display='none';$('form').style.display='block';
+  $('summaryBox').style.display='none';$('copyBtn').style.display='none';
+  $('name').value='';$('msg').value='';
+  attending=null;$('btnYes').classList.remove('sel');$('btnNo').classList.remove('sel');
+  $('extra').classList.remove('open');total=1;kids=0;
+  $('totalN').textContent=1;$('kidsN').textContent=0;renderAges();
+}
+
+function confettiPop(){
+  const colors=['#C67C8A','#E7C3C9','#DBB26A','#fff','#B05A6A'];
+  for(let i=0;i<36;i++){
+    const p=document.createElement('div');
+    p.style.cssText=`position:fixed;left:50%;top:38%;width:9px;height:12px;z-index:9;pointer-events:none;
+      background:${colors[i%colors.length]};border-radius:${i%3?2:8}px;`;
+    document.body.appendChild(p);
+    const a=Math.random()*Math.PI*2, v=120+Math.random()*220;
+    const dx=Math.cos(a)*v, dy=Math.sin(a)*v-160;
+    p.animate([
+      {transform:'translate(0,0) rotate(0)',opacity:1},
+      {transform:`translate(${dx}px,${dy+320}px) rotate(${Math.random()*720-360}deg)`,opacity:0}
+    ],{duration:1400+Math.random()*700,easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>p.remove();
+  }
+}
+
+/* ---------- host area dashboard ---------- */
+function loadResponses(){
+  if(!unlocked) return;
+  const status=$('hostStatus'), list=$('list'), totalsEl=$('totals');
+  let entries = JSON.parse(localStorage.getItem('rsvp_records_final')) || [];
+  
+  list.innerHTML=''; totalsEl.innerHTML='';
+  if(!entries.length){ status.textContent='No responses captured on this device yet.'; return; }
+  status.textContent='';
+  
+  entries.sort((a,b)=>b.ts-a.ts);
+  let g=0,kd=0,yes=0,no=0;
+  entries.forEach(e=>{ if(e.attending){yes++;g+=e.total||0;kd+=e.kids||0;} else no++; });
+  
+  totalsEl.innerHTML=`
+    <div class="tot"><div class="n">${g}</div><div class="l">Guests</div></div>
+    <div class="tot"><div class="n">${g-kd}</div><div class="l">Adults</div></div>
+    <div class="tot"><div class="n">${kd}</div><div class="l">Kids</div></div>
+    <div class="tot"><div class="n">${yes}/${yes+no}</div><div class="l">Yes</div></div>`;
+    
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  entries.forEach(e=>{
+    const d=document.createElement('div');d.className='resp';
+    d.innerHTML=`<span class="who">${esc(e.name)}</span>
+      <span class="tag ${e.attending?'yes':'no'}">${e.attending?'Coming':'Not coming'}</span>
+      ${e.attending?`<div class="meta">${e.total} guest${e.total>1?'s':''} · ${e.kids} kid${e.kids===1?'':'s'}${e.kids?` (ages ${esc(e.ages.join(', '))})`:''}</div>`:''}
+      ${e.msg?`<div class="msg">"${esc(e.msg)}"</div>`:''}
+      <button class="del" title="Remove" onclick="delResp('${e._key}')">✕</button>`;
+    list.appendChild(d);
+  });
+}
+
+function delResp(key){
+  if(!confirm('Remove this response?'))return;
+  let entries = JSON.parse(localStorage.getItem('rsvp_records_final')) || [];
+  entries = entries.filter(e => e._key !== key);
+  localStorage.setItem('rsvp_records_final', JSON.stringify(entries));
+  loadResponses();
+}
+
+function checkPin(){
+  if($('pin').value===HOST_PIN){
+    unlocked=true;$('pinGate').style.display='none';$('hostPanel').style.display='block';loadResponses();
+  }else{$('pinErr').textContent='Wrong PIN';$('pin').value='';}
+}
+
+$('pin') && $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')checkPin();});
+$('host').addEventListener('toggle',()=>{ if($('host').open && unlocked) loadResponses(); });
+renderAges();
+</script>
+</body>
+</html>
