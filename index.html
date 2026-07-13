@@ -7,9 +7,9 @@
 <meta property="og:title" content="Miraya's 1st Birthday — RSVP 🎀">
 <meta property="og:description" content="5th Sept (Sat.) · 13:00 · Tokyo Mithaiwala, Nishikasai — tap to tell us if you can join!">
 <meta name="description" content="RSVP for Miraya's 1st Birthday — 5th Sept (Sat.), 13:00, Tokyo Mithaiwala, Nishikasai.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --pink:#E7C3C9; --pink-soft:#F3DDE1; --rose:#C67C8A; --mauve:#B05A6A;
@@ -77,16 +77,16 @@ textarea{resize:vertical;min-height:70px}
 .choice button.sel{background:var(--rose);border-color:var(--rose);color:#fff;transform:scale(1.03)}
 .choice button:hover{border-color:var(--rose)}
 
-.stepper{display:flex;align-items:center;gap:14px}
+.stepper{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
 .stepper button{
   width:46px;height:46px;border-radius:50%;border:2px solid var(--pink);background:#fff;
   font-size:24px;font-weight:800;color:var(--mauve);cursor:pointer;line-height:1;
 }
 .stepper button:hover{border-color:var(--rose)}
 .stepper .num{font-family:'Fredoka',sans-serif;font-size:26px;font-weight:700;min-width:34px;text-align:center;color:var(--mauve)}
-.hint{font-size:12.5px;font-weight:700;color:#9b8a8e;margin-top:4px}
+.hint{font-size:12.5px;font-weight:700;color:#9b8a8e;margin-top:4px;display:inline-block}
 
-.kids-ages{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.kids-ages{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;margin-bottom:14px;}
 .kid{
   display:flex;align-items:center;gap:8px;background:var(--pink-soft);
   border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;
@@ -221,205 +221,4 @@ summary::-webkit-details-marker{display:none}
     <div id="pinGate" style="text-align:center;margin-top:14px">
       <div style="font-weight:800;font-size:13px;color:#9b8a8e;margin-bottom:8px">Enter host PIN to view responses</div>
       <input type="text" id="pin" inputmode="numeric" maxlength="4" placeholder="• • • •"
-        style="width:130px;text-align:center;letter-spacing:.35em;font-size:18px">
-      <button class="mini" style="margin-top:0" onclick="checkPin()">Unlock</button>
-      <div class="err" id="pinErr"></div>
-    </div>
-    <div id="hostPanel" style="display:none">
-      <div id="hostStatus">Loading…</div>
-      <div class="totals" id="totals"></div>
-      <div id="list"></div>
-    </div>
-  </details>
-</div>
-
-<script>
-/* ---------- ambient sparkles ---------- */
-(function(){
-  for(let i=0;i<14;i++){
-    const s=document.createElement('div');
-    s.className='sparkle';s.textContent='✦';
-    s.style.left=Math.random()*100+'vw';
-    s.style.top=Math.random()*100+'vh';
-    s.style.fontSize=(10+Math.random()*16)+'px';
-    s.style.animationDelay=(Math.random()*3)+'s';
-    document.body.appendChild(s);
-  }
-})();
-
-/* ---------- form state ---------- */
-let attending=null, total=1, kids=0;
-const hasStorage = typeof window.storage !== 'undefined' && window.storage;
-
-const $=id=>document.getElementById(id);
-$('btnYes').onclick=()=>setAttend(true);
-$('btnNo').onclick=()=>setAttend(false);
-
-function setAttend(v){
-  attending=v;
-  $('btnYes').classList.toggle('sel',v);
-  $('btnNo').classList.toggle('sel',!v);
-  $('extra').classList.toggle('open',v);
-}
-function step(which,d){
-  if(which==='total'){ total=Math.min(12,Math.max(1,total+d)); if(kids>total-0) kids=Math.min(kids,total); }
-  else { kids=Math.min(8,Math.max(0,kids+d)); if(kids>total) total=kids; }
-  $('totalN').textContent=total; $('kidsN').textContent=kids;
-  renderAges();
-}
-function renderAges(){
-  const box=$('ages'); const prev=[...box.querySelectorAll('select')].map(s=>s.value);
-  box.innerHTML='';
-  for(let i=0;i<kids;i++){
-    const div=document.createElement('div');div.className='kid';
-    const sel=document.createElement('select');
-    sel.innerHTML='<option value="">age?</option>'+
-      '<option value="0">under 1</option>'+
-      Array.from({length:17},(_,a)=>`<option value="${a+1}">${a+1}</option>`).join('');
-    if(prev[i]) sel.value=prev[i];
-    div.append(`Kid ${i+1}: `,sel);
-    box.appendChild(div);
-  }
-}
-
-function buildEntry(){
-  const name=$('name').value.trim();
-  if(!name) return {error:'Please tell us your name 🙂'};
-  if(attending===null) return {error:'Please choose yes or no 🙂'};
-  const entry={name, attending, ts:Date.now()};
-  if(attending){
-    entry.total=total; entry.kids=kids;
-    entry.ages=[...$('ages').querySelectorAll('select')].map(s=>s.value);
-    if(entry.ages.some(a=>a==='')) return {error:'Please pick an age for each kid 🙂'};
-    entry.ages=entry.ages.map(a=>a==='0'?'under 1':a);
-  }
-  entry.msg=$('msg').value.trim();
-  return {entry};
-}
-
-function summaryText(e){
-  let s=`RSVP — Miraya's 1st Birthday\nName: ${e.name}\nAttending: ${e.attending?'YES 🎉':'No 😢'}`;
-  if(e.attending){
-    s+=`\nGuests: ${e.total} (kids: ${e.kids}${e.kids?` — ages ${e.ages.join(', ')}`:''})`;
-  }
-  if(e.msg) s+=`\nMessage: ${e.msg}`;
-  return s;
-}
-
-let lastSummary='';
-async function submitRSVP(){
-  $('err').textContent='';
-  const {entry,error}=buildEntry();
-  if(error){$('err').textContent=error;return;}
-  const btn=$('submitBtn');btn.disabled=true;btn.textContent='Sending…';
-  let saved=false;
-  if(hasStorage){
-    try{
-      const key='rsvp:'+entry.ts+'_'+Math.random().toString(36).slice(2,7);
-      const res=await window.storage.set(key,JSON.stringify(entry),true);
-      saved=!!res;
-    }catch(e){saved=false;}
-  }
-  btn.disabled=false;btn.textContent='Send my RSVP ♥';
-  lastSummary=summaryText(entry);
-  $('form').style.display='none';
-  $('done').style.display='block';
-  $('doneTitle').textContent=entry.attending?'Yay, see you there! 🎉':"We'll miss you 💗";
-  if(saved){
-    $('doneText').textContent=`Thank you ${entry.name}${entry.attending?` — we've noted ${entry.total} guest${entry.total>1?'s':''}`:''}! Your response has been sent to Miraya's family. 💌`;
-  }else{
-    $('doneText').textContent=`Thank you ${entry.name}! It seems this page wasn't opened from the invitation link, so your response couldn't be sent automatically — please copy it below and message it to Miraya's family.`;
-    $('summaryBox').style.display='block';$('summaryBox').textContent=lastSummary;
-    $('copyBtn').style.display='inline-block';
-  }
-  confettiPop();
-  loadResponses();
-}
-function copySummary(){
-  navigator.clipboard && navigator.clipboard.writeText(lastSummary);
-  $('copyBtn').textContent='Copied! ✓';
-  setTimeout(()=>$('copyBtn').textContent='Copy my response',1600);
-}
-function resetForm(){
-  $('done').style.display='none';$('form').style.display='block';
-  $('summaryBox').style.display='none';$('copyBtn').style.display='none';
-  $('name').value='';$('msg').value='';setAttend(null===attending?null:attending);
-  attending=null;$('btnYes').classList.remove('sel');$('btnNo').classList.remove('sel');
-  $('extra').classList.remove('open');total=1;kids=0;
-  $('totalN').textContent=1;$('kidsN').textContent=0;renderAges();
-}
-
-/* ---------- tiny confetti pop ---------- */
-function confettiPop(){
-  const colors=['#C67C8A','#E7C3C9','#DBB26A','#fff','#B05A6A'];
-  for(let i=0;i<36;i++){
-    const p=document.createElement('div');
-    p.style.cssText=`position:fixed;left:50%;top:38%;width:9px;height:12px;z-index:9;pointer-events:none;
-      background:${colors[i%colors.length]};border-radius:${i%3?2:8}px;`;
-    document.body.appendChild(p);
-    const a=Math.random()*Math.PI*2, v=120+Math.random()*220;
-    const dx=Math.cos(a)*v, dy=Math.sin(a)*v-160;
-    p.animate([
-      {transform:'translate(0,0) rotate(0)',opacity:1},
-      {transform:`translate(${dx}px,${dy+320}px) rotate(${Math.random()*720-360}deg)`,opacity:0}
-    ],{duration:1400+Math.random()*700,easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>p.remove();
-  }
-}
-
-/* ---------- host view ---------- */
-async function loadResponses(){
-  if(!unlocked) return;
-  const status=$('hostStatus'), list=$('list'), totalsEl=$('totals');
-  if(!hasStorage){status.textContent='Responses appear here when the page is opened from its published link.';return;}
-  status.textContent='Loading…';list.innerHTML='';totalsEl.innerHTML='';
-  let keys=[];
-  try{
-    const res=await window.storage.list('rsvp:',true);
-    keys=(res&&res.keys)||[];
-  }catch(e){status.textContent='No responses yet — be the first!';return;}
-  if(!keys.length){status.textContent='No responses yet — be the first!';return;}
-  const entries=[];
-  for(const k of keys){
-    try{
-      const r=await window.storage.get(k,true);
-      if(r&&r.value){const e=JSON.parse(r.value);e._key=k;entries.push(e);}
-    }catch(e){}
-  }
-  entries.sort((a,b)=>b.ts-a.ts);
-  let g=0,kd=0,yes=0,no=0;
-  entries.forEach(e=>{ if(e.attending){yes++;g+=e.total||0;kd+=e.kids||0;} else no++; });
-  totalsEl.innerHTML=`
-    <div class="tot"><div class="n">${g}</div><div class="l">Guests</div></div>
-    <div class="tot"><div class="n">${g-kd}</div><div class="l">Adults</div></div>
-    <div class="tot"><div class="n">${kd}</div><div class="l">Kids</div></div>
-    <div class="tot"><div class="n">${yes}/${yes+no}</div><div class="l">Yes</div></div>`;
-  status.textContent='';
-  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  entries.forEach(e=>{
-    const d=document.createElement('div');d.className='resp';
-    d.innerHTML=`<span class="who">${esc(e.name)}</span>
-      <span class="tag ${e.attending?'yes':'no'}">${e.attending?'Coming':'Not coming'}</span>
-      ${e.attending?`<div class="meta">${e.total} guest${e.total>1?'s':''} · ${e.kids} kid${e.kids===1?'':'s'}${e.kids?` (ages ${esc(e.ages.join(', '))})`:''}</div>`:''}
-      ${e.msg?`<div class="msg">"${esc(e.msg)}"</div>`:''}
-      <button class="del" title="Remove" onclick="delResp('${e._key}')">✕</button>`;
-    list.appendChild(d);
-  });
-}
-async function delResp(key){
-  if(!confirm('Remove this response?'))return;
-  try{await window.storage.delete(key,true);}catch(e){}
-  loadResponses();
-}
-const HOST_PIN='0509'; // 5th Sept ♥ — change if you like
-let unlocked=false;
-function checkPin(){
-  if($('pin').value===HOST_PIN){
-    unlocked=true;$('pinGate').style.display='none';$('hostPanel').style.display='block';loadResponses();
-  }else{$('pinErr').textContent='Wrong PIN';$('pin').value='';}
-}
-$('pin') && $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')checkPin();});
-$('host').addEventListener('toggle',()=>{ if($('host').open && unlocked) loadResponses(); });
-renderAges();
-</script>
-</body>
-</html>
+style="width:130px;text-align:center;letter-spacing:.35em;font-size:18px">UnlockLoading…/* ---------- ambient sparkles ---------- */(function(){for(let i=0;i<14;i++){const s=document.createElement('div');s.className='sparkle';s.textContent='✦';s.style.left=Math.random()*100+'vw';s.style.top=Math.random()*100+'vh';s.style.fontSize=(10+Math.random()*16)+'px';s.style.animationDelay=(Math.random()*3)+'s';document.body.appendChild(s);}})();/* ---------- form state ---------- */let attending=null, total=1, kids=0, unlocked=false;const HOST_PIN='0509';const $=id=>document.getElementById(id);$('btnYes').onclick=()=>setAttend(true);$('btnNo').onclick=()=>setAttend(false);function setAttend(v){attending=v;$('btnYes').classList.toggle('sel',v);$('btnNo').classList.toggle('sel',!v);$('extra').classList.toggle('open',v);}function step(which,d){if(which==='total'){ total=Math.min(12,Math.max(1,total+d)); if(kids>total) kids=Math.min(kids,total); }else { kids=Math.min(8,Math.max(0,kids+d)); if(kids>total) total=kids; }$('totalN').textContent=total; $('kidsN').textContent=kids;renderAges();}function renderAges(){const box=$('ages'); const prev=[...box.querySelectorAll('select')].map(s=>s.value);box.innerHTML='';for(let i=0;i<kids;i++){const div=document.createElement('div');div.className='kid';const sel=document.createElement('select');sel.innerHTML='age?'+'under 1'+Array.from({length:17},(_,a)=><option value="${a+1}">${a+1}</option>).join('');if(prev[i]) sel.value=prev[i];div.append(Kid ${i+1}: ,sel);box.appendChild(div);}}function buildEntry(){const name=$('name').value.trim();if(!name) return {error:'Please tell us your name 🙂'};if(attending===null) return {error:'Please choose yes or no 🙂'};const entry={key: 'rsvp' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), name, attending, ts:Date.now()};if(attending){entry.total=total; entry.kids=kids;entry.ages=[...$('ages').querySelectorAll('select')].map(s=>s.value);if(entry.ages.some(a=>a==='')) return {error:'Please pick an age for each kid 🙂'};entry.ages=entry.ages.map(a=>a==='0'?'under 1':a);}entry.msg=$('msg').value.trim();return {entry};}function summaryText(e){let s=RSVP — Miraya's 1st Birthday\nName: ${e.name}\nAttending: ${e.attending?'YES 🎉':'No 😢'};if(e.attending){s+=\nGuests: ${e.total} (kids: ${e.kids}${e.kids? — ages ${e.ages.join(', ')}:''});}if(e.msg) s+=\nMessage: ${e.msg};return s;}let lastSummary='';function submitRSVP(){$('err').textContent='';const {entry,error}=buildEntry();if(error){$('err').textContent=error;return;}let localData = JSON.parse(localStorage.getItem('rsvp_records_v4')) || [];localData.push(entry);localStorage.setItem('rsvp_records_v4', JSON.stringify(localData));lastSummary=summaryText(entry);$('form').style.display='none';$('done').style.display='block';$('doneTitle').textContent=entry.attending?'Yay, see you there! 🎉':"We'll miss you 💗";$('doneText').textContent=Thank you ${entry.name}! For link stability on your free web host, please copy the summary below and message it directly to Miraya's family. 💌;$('summaryBox').style.display='block';$('summaryBox').textContent=lastSummary;$('copyBtn').style.display='inline-block';confettiPop();if(unlocked) loadResponses();}function copySummary(){if(navigator.clipboard && navigator.clipboard.writeText){navigator.clipboard.writeText(lastSummary);} else {const el = document.createElement('textarea');el.value = lastSummary;document.body.appendChild(el);el.select();document.execCommand('copy');el.remove();}$('copyBtn').textContent='Copied! ✓';setTimeout(()=>$('copyBtn').textContent='Copy my response',1600);}function resetForm(){$('done').style.display='none';$('form').style.display='block';$('summaryBox').style.display='none';$('copyBtn').style.display='none';$('name').value='';$('msg').value='';attending=null;$('btnYes').classList.remove('sel');$('btnNo').classList.remove('sel');$('extra').classList.remove('open');total=1;kids=0;$('totalN').textContent=1;$('kidsN').textContent=0;renderAges();}function confettiPop(){const colors=['#C67C8A','#E7C3C9','#DBB26A','#fff','#B05A6A'];for(let i=0;i<36;i++){const p=document.createElement('div');p.style.cssText=position:fixed;left:50%;top:38%;width:9px;height:12px;z-index:9;pointer-events:none; background:${colors[i%colors.length]};border-radius:${i%3?2:8}px;;document.body.appendChild(p);const a=Math.random()Math.PI2, v=120+Math.random()*220;const dx=Math.cos(a)*v, dy=Math.sin(a)*v-160;p.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:translate(${dx}px,${dy+320}px) rotate(${Math.random()*720-360}deg),opacity:0}],{duration:1400+Math.random()*700,easing:'cubic-bezier(.2,.7,.4,1)'}).onfinish=()=>p.remove();}}/* ---------- host area dashboard ---------- */function loadResponses(){if(!unlocked) return;const status=$('hostStatus'), list=$('list'), totalsEl=$('totals');let entries = JSON.parse(localStorage.getItem('rsvp_records_v4')) || [];list.innerHTML=''; totalsEl.innerHTML='';if(!entries.length){ status.textContent='No responses captured on this device yet.'; return; }status.textContent='';entries.sort((a,b)=>b.ts-a.ts);let g=0,kd=0,yes=0,no=0;entries.forEach(e=>{ if(e.attending){yes++;g+=e.total||0;kd+=e.kids||0;} else no++; });totalsEl.innerHTML= <div class="tot"><div class="n">${g}</div><div class="l">Guests</div></div> <div class="tot"><div class="n">${g-kd}</div><div class="l">Adults</div></div> <div class="tot"><div class="n">${kd}</div><div class="l">Kids</div></div> <div class="tot"><div class="n">${yes}/${yes+no}</div><div class="l">Yes</div></div>;const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&','<':'<','>':'>','"':'"'}[c]));entries.forEach(e=>{const d=document.createElement('div');d.className='resp';d.innerHTML=<span class="who">${esc(e.name)}</span> <span class="tag ${e.attending?'yes':'no'}">${e.attending?'Coming':'Not coming'}</span> ${e.attending?${e.total} guest${e.total>1?'s':''} · ${e.kids} kid${e.kids===1?'':'s'}${e.kids? (ages ${esc(e.ages.join(', '))}):''}:''} ${e.msg?"${esc(e.msg)}":''} <button class="del" title="Remove" onclick="delResp('${e._key}')">✕</button>;list.appendChild(d);});}function delResp(key){if(!confirm('Remove this response?'))return;let entries = JSON.parse(localStorage.getItem('rsvp_records_v4')) || [];entries = entries.filter(e => e._key !== key);localStorage.setItem('rsvp_records_v4', JSON.stringify(entries));loadResponses();}function checkPin(){if($('pin').value===HOST_PIN){unlocked=true;$('pinGate').style.display='none';$('hostPanel').style.display='block';loadResponses();}else{$('pinErr').textContent='Wrong PIN';$('pin').value='';}}$('pin') && $('pin').addEventListener('keydown',e=>{if(e.key==='Enter')checkPin();});$('host').addEventListener('toggle',()=>{ if($('host').open && unlocked) loadResponses(); });renderAges();
