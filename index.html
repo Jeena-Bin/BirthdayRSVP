@@ -9,7 +9,7 @@
 <meta name="description" content="RSVP for Miraya's 1st Birthday — 5th Sept (Sat.), 13:00, Tokyo Mithaiwala, Nishikasai.">
 <link rel="preconnect" href="https://googleapis.com">
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
-<link href="https://script.google.com/macros/s/AKfycbzLOqQ7friW2jL9SqYCeFO1dMmq4UBamBGhn0R6spO4RABsgnemNsbOcNYSPBMdCRt4mA/exec" rel="stylesheet">
+<link href="https://googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--pink:#E7C3C9;--pink-soft:#F3DDE1;--rose:#C67C8A;--mauve:#B05A6A;--white:#FFFDFB;--charcoal:#4A4648;--gold:#DBB26A;}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -111,7 +111,7 @@ let attending=null,total=1,kids=0;
 const $=id=>document.getElementById(id);
 
 // PASTE YOUR GOOGLE SHEET WEB APP URL BETWEEN THE QUOTES BELOW:
-const GOOGLE_SHEET_URL = "PASTE_YOUR_DEPLOY_URL_HERE";
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzLOqQ7friW2jL9SqYCeFO1dMmq4UBamBGhn0R6spO4RABsgnemNsbOcNYSPBMdCRt4mA/exec";
 
 $('btnYes').onclick=()=>setAttend(true);$('btnNo').onclick=()=>setAttend(false);
 function setAttend(v){attending=v;$('btnYes').classList.toggle('sel',v);$('btnNo').classList.toggle('sel',!v);$('extra').classList.toggle('open',v);}
